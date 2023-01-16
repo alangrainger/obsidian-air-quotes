@@ -63,11 +63,11 @@ export class SelectText extends Modal {
   }
 
   async onOpen () {
-    const {modalEl} = this
+    const {modalEl, contentEl} = this
     if (Platform.isDesktop) {
-      // Resize to fit the viewport width on desktop
       modalEl.addClass('air-quotes-select-modal')
     }
+    this.titleEl.setText('Select quote')
     // Set the initial quote text
     await this.setText()
     this.eventListener = (event: KeyboardEvent) => this.onKeyPress(event)
@@ -97,7 +97,7 @@ export class SelectText extends Modal {
         this.insertText().then()
         break
     }
-    this.index = Math.max(index, 1)
+    index = Math.max(index, 1)
     this.index = Math.min(index, this.sentences.length)
     this.setText().then()
   }
@@ -107,25 +107,29 @@ export class SelectText extends Modal {
    */
   async setText () {
     this.contentEl.empty()
-    const text = this.sentences.slice(0, this.index).join('').trim()
+    const text = `*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n` + this.outputAsMarkdownQuote()
     await MarkdownRenderer.renderMarkdown(text, this.contentEl, '', this.component) // I'm  not sure what sourcePath and component do here...
   }
 
-  /**
-   * Insert the final chosen quote into the editor
-   */
-  async insertText () {
-    const lines = [
+  outputAsMarkdownQuote() {
+    return [
       '> [!quote]',
       ...this.sentences
         .slice(0, this.index)
         .join('').trim()
         .split('\n')
         .map(x => '> ' + x), ''
-    ]
+    ].join('\n')
+  }
+
+  /**
+   * Insert the final chosen quote into the editor
+   */
+  async insertText () {
+    const text = this.outputAsMarkdownQuote()
     await this.close()
-    this.plugin.editor.replaceRange(lines.join('\n'), this.plugin.cursorPosition)
-    this.plugin.editor.setCursor({line: this.plugin.cursorPosition.line + lines.length, ch: 0})
+    this.plugin.editor.replaceRange(text, this.plugin.cursorPosition)
+    this.plugin.editor.setCursor({line: this.plugin.cursorPosition.line + text.split('\n').length, ch: 0})
   }
 
   onClose () {
