@@ -1,0 +1,11 @@
+{
+	"id": "air-quotes",
+	"name": "Air Quotes",
+	"version": "0.0.1",
+	"minAppVersion": "0.15.0",
+	"description": "",
+	"author": "Alan Grainger",
+	"authorUrl": "",
+	"fundingUrl": "https://ko-fi.com/alan_",
+	"isDesktopOnly": false
+}

@@ -1,0 +1,12 @@
+.airquotes-selected {
+    background: #884;
+}
+
+.airquotes-preview-item {
+    margin-top: 0.7em;
+}
+
+.airquotes-search-modal > .suggestion-item {
+    border-left: 2px solid #ccc;
+    margin-bottom: 15px;
+}
