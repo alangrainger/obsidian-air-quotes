@@ -11,8 +11,29 @@
     margin-bottom: 15px;
 }
 
-.air-quotes-select-modal {
+.air-quotes-select-modal-desktop {
     width: 700px;
     top: 80px;
     position: absolute;
+}
+
+.air-quotes-select-modal-mobile {
+    top: 0;
+    max-height: 100vh !important;
+}
+
+.air-quotes-select-modal-mobile > .modal-content {
+    overflow: visible !important;
+}
+
+.air-quotes-select-buttons {
+    position: fixed;
+    bottom: 0;
+    height: 40px;
+    display: flex;
+    width: 100%;
+}
+
+.air-quotes-select-buttons button {
+    width: 20%;
 }

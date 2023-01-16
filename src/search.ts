@@ -63,15 +63,34 @@ export class SelectText extends Modal {
   }
 
   async onOpen () {
-    const {modalEl, contentEl} = this
-    if (Platform.isDesktop) {
-      modalEl.addClass('air-quotes-select-modal')
+    const {modalEl} = this
+    if (Platform.isMobile) {
+      modalEl.addClass('air-quotes-select-modal-mobile')
+    } else {
+      modalEl.addClass('air-quotes-select-modal-desktop')
     }
     this.titleEl.setText('Select quote')
     // Set the initial quote text
     await this.setText()
     this.eventListener = (event: KeyboardEvent) => this.onKeyPress(event)
     window.addEventListener('keydown', this.eventListener)
+    if (Platform.isMobile) {
+      const buttons = modalEl.createEl('div', {cls: 'air-quotes-select-buttons'})
+      // Add the increment/decrement buttons
+      const values = ['-5', '-1', '+1', '+5']
+      values.forEach((value: string) => {
+        buttons.createEl('button', {text: value}, button => button.onclick = () => this.updateIndex(+value))
+      })
+      // Add the "Insert quote" button
+      buttons.createEl('button', {text: '✅'}, button => button.onclick = () => this.insertText())
+    }
+  }
+
+  updateIndex (amount: number) {
+    let index = this.index + amount
+    index = Math.max(index, 1)
+    this.index = Math.min(index, this.sentences.length)
+    this.setText().then()
   }
 
   /**
@@ -82,24 +101,21 @@ export class SelectText extends Modal {
     let index = this.index
     switch (event.key) {
       case 'ArrowDown':
-        index += 5
+        this.updateIndex(5)
         break
       case 'ArrowUp':
-        index -= 5
+        this.updateIndex(-5)
         break
       case 'ArrowLeft':
-        index -= 1
+        this.updateIndex(-1)
         break
       case 'ArrowRight':
-        index += 1
+        this.updateIndex(1)
         break
       case 'Enter':
         this.insertText().then()
         break
     }
-    index = Math.max(index, 1)
-    this.index = Math.min(index, this.sentences.length)
-    this.setText().then()
   }
 
   /**
@@ -107,11 +123,15 @@ export class SelectText extends Modal {
    */
   async setText () {
     this.contentEl.empty()
-    const text = `*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n` + this.outputAsMarkdownQuote()
+    const helpText = Platform.isDesktop ? `*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n` : ''
+    const text = helpText + this.outputAsMarkdownQuote()
     await MarkdownRenderer.renderMarkdown(text, this.contentEl, '', this.component) // I'm  not sure what sourcePath and component do here...
   }
 
-  outputAsMarkdownQuote() {
+  /**
+   * Format as a callout quote
+   */
+  outputAsMarkdownQuote () {
     return [
       '> [!quote]',
       ...this.sentences
