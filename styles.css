@@ -10,3 +10,8 @@
     border-left: 2px solid #ccc;
     margin-bottom: 15px;
 }
+
+.air-quotes-select-modal {
+    width: 50%;
+    top: 80px;
+}
