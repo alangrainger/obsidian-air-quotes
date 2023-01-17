@@ -4,6 +4,7 @@ import AirQuotes from './main'
 export class SearchModal extends SuggestModal<any> {
   plugin: AirQuotes
   sourceText: string
+  searchText: string
 
   constructor (plugin: AirQuotes) {
     super(plugin.app)
@@ -15,18 +16,25 @@ export class SearchModal extends SuggestModal<any> {
     // Import the book
     this.app.vault.cachedRead(this.plugin.sourceFile)
       .then(text => {
-        // Do some basic character replacements to allow better string matching
+        this.sourceText = text
+        // Do some basic character replacements to allow for easily typed input query
+        // (very hard for people to type smart quotes in the input)
         text = text.replace(/[‘’]/g, '\'') // replace single curly quotes
         text = text.replace(/[“”]/g, '"') // replace double curly quotes
-        this.sourceText = text
+        this.searchText = text
       })
   }
 
+  /**
+   * Return an array of passages from the source text which match the user's inputted query string
+   * @param query
+   * @return array
+   */
   getSuggestions (query: string): any[] | Promise<any[]> {
     if (query.length > 5) {
       // Sanitise the input text to use in a regex
       query = query.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
-      const matches = [...this.sourceText.matchAll(new RegExp(query, 'ig'))]
+      const matches = [...this.searchText.matchAll(new RegExp(query, 'ig'))]
       return matches.map(match => {
         // Add previews of all matches
         const start = match.index || 0
@@ -44,11 +52,13 @@ export class SearchModal extends SuggestModal<any> {
   onChooseSuggestion (item: any, evt: MouseEvent | KeyboardEvent) {
     // Take a sample of the next 5000 characters, to use in the insert modal
     const sample = this.sourceText.slice(item.index, item.index + 5000)
-    new SelectText(this.plugin, sample).open()
+
+    // Launch the quote selection/adjustment modal
+    new QuoteModal(this.plugin, sample).open()
   }
 }
 
-export class SelectText extends Modal {
+export class QuoteModal extends Modal {
   plugin: AirQuotes
   sentences: string[]
   component: Component = new Component()
@@ -59,7 +69,7 @@ export class SelectText extends Modal {
     super(plugin.app)
     this.plugin = plugin
     // Split the incoming text into sentences
-    this.sentences = [...text.matchAll(/.*?[.?!]['"’”]?\s+(?=[“‘]?[A-Z])/g)].map(x => x[0])
+    this.sentences = [...text.matchAll(/.+?[.?!\n]['"’”]?\s+(?=[“‘"']?[A-Z])/sg)].map(x => x[0])
   }
 
   async onOpen () {
@@ -71,7 +81,7 @@ export class SelectText extends Modal {
     }
     this.titleEl.setText('Select quote')
     // Set the initial quote text
-    await this.setText()
+    await this.setModalContents()
     this.eventListener = (event: KeyboardEvent) => this.onKeyPress(event)
     window.addEventListener('keydown', this.eventListener)
     if (Platform.isMobile) {
@@ -82,15 +92,19 @@ export class SelectText extends Modal {
         buttons.createEl('button', {text: value}, button => button.onclick = () => this.updateIndex(+value))
       })
       // Add the "Insert quote" button
-      buttons.createEl('button', {text: '✅'}, button => button.onclick = () => this.insertText())
+      buttons.createEl('button', {text: '✅'}, button => button.onclick = () => this.insertTextIntoEditor())
     }
   }
 
+  /**
+   * Increment/decrement the index value (i.e. how many sentences will compose the final quote)
+   * @param {number} amount
+   */
   updateIndex (amount: number) {
     let index = this.index + amount
     index = Math.max(index, 1)
     this.index = Math.min(index, this.sentences.length)
-    this.setText().then()
+    this.setModalContents().then()
   }
 
   /**
@@ -98,7 +112,6 @@ export class SelectText extends Modal {
    * @param event
    */
   onKeyPress (event: KeyboardEvent) {
-    let index = this.index
     switch (event.key) {
       case 'ArrowDown':
         this.updateIndex(5)
@@ -113,40 +126,48 @@ export class SelectText extends Modal {
         this.updateIndex(1)
         break
       case 'Enter':
-        this.insertText().then()
+        this.insertTextIntoEditor().then()
         break
     }
   }
 
   /**
-   * Replace the contents of the modal with rendered markdown from the source text
+   * Replace the contents of the modal with the selected quote from the source text
    */
-  async setText () {
+  async setModalContents () {
     this.contentEl.empty()
     const helpText = Platform.isDesktop ? `*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n` : ''
-    const text = helpText + this.outputAsMarkdownQuote()
-    await MarkdownRenderer.renderMarkdown(text, this.contentEl, '', this.component) // I'm  not sure what sourcePath and component do here...
+    const text = helpText + this.formatAsFinalMarkdownOutput()
+    // I'm  not sure what sourcePath and component do here, but they are required parameters for renderMarkdown()
+    await MarkdownRenderer.renderMarkdown(text, this.contentEl, '', this.component)
   }
 
   /**
-   * Format as a callout quote
+   * Format the selected quote text as Markdown, ready for inserting into the note
    */
-  outputAsMarkdownQuote () {
-    return [
-      '> [!quote]',
-      ...this.sentences
-        .slice(0, this.index)
-        .join('').trim()
-        .split('\n')
-        .map(x => '> ' + x), ''
-    ].join('\n')
+  formatAsFinalMarkdownOutput () {
+    const lines = []
+    let prefix = '> '
+    if (this.plugin.settings.outputStyle === 'callout') {
+      // Add the header line for the callout
+      lines.push(this.plugin.settings.calloutHeader)
+    } else if (this.plugin.settings.outputStyle === 'none') {
+      // Remove the blockquote prefix for plain-text style
+      prefix = ''
+    }
+    lines.push(...this.sentences
+      .slice(0, this.index)
+      .join('').trim()
+      .split('\n')
+      .map(x => prefix + x), '')
+    return lines.join('\n')
   }
 
   /**
    * Insert the final chosen quote into the editor
    */
-  async insertText () {
-    const text = this.outputAsMarkdownQuote()
+  async insertTextIntoEditor () {
+    const text = this.formatAsFinalMarkdownOutput()
     await this.close()
     this.plugin.editor.replaceRange(text, this.plugin.cursorPosition)
     this.plugin.editor.setCursor({line: this.plugin.cursorPosition.line + text.split('\n').length, ch: 0})

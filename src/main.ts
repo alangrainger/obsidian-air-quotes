@@ -1,4 +1,4 @@
-import { Editor, EditorPosition, MarkdownView, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
 
@@ -28,6 +28,7 @@ export default class AirQuotes extends Plugin {
           const bookPath = contents.match(new RegExp(regex, 'm'))?.[1]
           if (!bookPath) {
             // No matching YAML/frontmatter field was found
+            new Notice('No source path found in YAML/frontmatter. Make sure to link to your source text.')
             return
           }
           // Attempt to resolve the link text into a matching TFile
@@ -35,6 +36,8 @@ export default class AirQuotes extends Plugin {
           if (bookFile) {
             this.sourceFile = bookFile
             new SearchModal(this).open()
+          } else {
+            new Notice('Unable to resolve book path: ' + bookPath)
           }
         }
       }
