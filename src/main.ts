@@ -1,6 +1,8 @@
-import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, FileSystemAdapter, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
+import { ChildProcess, spawn } from 'child_process'
+import { convertEpub } from './pandoc'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -13,6 +15,14 @@ export default class AirQuotes extends Plugin {
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
 
     this.addCommand({
+      id: 'air-quote-pandoc',
+      name: 'Convert book with Pandoc',
+      editorCallback: async () => {
+        await convertEpub(this)
+      }
+    })
+
+    this.addCommand({
       id: 'air-quote-insert',
       name: 'Insert quote',
       editorCallback: async (editor: Editor, view: MarkdownView) => {
@@ -22,7 +32,7 @@ export default class AirQuotes extends Plugin {
           // Save the cursor insert position
           this.cursorPosition = editor.getCursor()
           // Parse note data to get YAML field
-          const field = this.settings.bookSource.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
+          const field = this.settings.bookSourceVariable.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
           const regex = `^${field}:{1,2}\\s+\\[\\[(.+?)]]$`
           const contents = await app.vault.cachedRead(view.file)
           const bookPath = contents.match(new RegExp(regex, 'm'))?.[1]
