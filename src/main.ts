@@ -1,4 +1,4 @@
-import { Editor, EditorPosition, FileSystemAdapter, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, FileSystemAdapter, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
 import { ChildProcess, spawn } from 'child_process'
@@ -13,20 +13,6 @@ export default class AirQuotes extends Plugin {
   async onload () {
     await this.loadSettings()
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
-
-    this.addCommand({
-      id: 'air-quote-pandoc',
-      name: 'Convert book with Pandoc',
-      editorCallback: async (editor: Editor, view: MarkdownView) => {
-        const file = await convertEpub(this)
-        console.log(file)
-        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-        if (file && markdownView) {
-          // Insert the link to the converted file
-          editor.replaceRange('[[' + file.slice(0, -3) + ']]', editor.getCursor())
-        }
-      }
-    })
 
     this.addCommand({
       id: 'air-quote-insert',
@@ -58,6 +44,22 @@ export default class AirQuotes extends Plugin {
         }
       }
     })
+
+    // Add Pandoc conversion command for desktop users
+    if (Platform.isDesktop) {
+      this.addCommand({
+        id: 'air-quote-pandoc',
+        name: 'Convert book with Pandoc',
+        editorCallback: async (editor: Editor, view: MarkdownView) => {
+          const file = await convertEpub(this)
+          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+          if (file && markdownView) {
+            // Insert the link to the converted file
+            editor.replaceRange('[[' + file.slice(0, -3) + ']]', editor.getCursor())
+          }
+        }
+      })
+    }
   }
 
   onunload () {

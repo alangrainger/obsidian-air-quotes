@@ -20,3 +20,28 @@ and then hit Enter to insert it into my note:
 
 ## How it works
 
+#### Step 1
+
+You first need a Markdown format version of the book in your vault. This is the source for the quote text.
+
+It's easy to convert pretty much anything to Markdown with [Pandoc](https://pandoc.org/).
+You don't need this plugin to do it - you can do the conversion yourself - but if you are using Windows
+there is a command in the plugin to do the conversion for you (requires Pandoc to be installed first).
+
+#### Step 2
+
+Link the source text to your current note in a YAML format. You can use either the standard
+format:
+
+```
+---
+source_text: [[Path/To/Amazing Book]]
+---
+```
+
+or the Dataview format:
+
+```
+source_text:: [[Path/To/Amazing Book]]
+```
+

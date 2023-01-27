@@ -1,10 +1,26 @@
 import { spawn } from 'child_process'
 import AirQuotes from './main'
-import { Notice } from 'obsidian'
-import { type } from 'os'
+import { Notice, Platform } from 'obsidian'
 
 export async function convertEpub (plugin: AirQuotes): Promise<string | null> {
-  const sourceFile = plugin.settings.tempBookSource
+  if (Platform.isMobile) {
+    new Notice('Pandoc conversion is not supported on mobile')
+    return null
+  }
+
+  // Get the source file path with the system file picker
+  const sourceFile = await new Promise(resolve => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.onchange = () => {
+      // @ts-ignore
+      resolve(input.files?.item(0)?.path)
+    }
+    input.click()
+  })
+  if (!sourceFile || typeof sourceFile !== 'string') {
+    return null
+  }
 
   // Get just the file name from the full path
   let newFilename = sourceFile.replace(/.*[/\\]/, '').replace(/\.\w+?$/, '') + '.md'
