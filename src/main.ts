@@ -17,8 +17,14 @@ export default class AirQuotes extends Plugin {
     this.addCommand({
       id: 'air-quote-pandoc',
       name: 'Convert book with Pandoc',
-      editorCallback: async () => {
-        await convertEpub(this)
+      editorCallback: async (editor: Editor, view: MarkdownView) => {
+        const file = await convertEpub(this)
+        console.log(file)
+        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (file && markdownView) {
+          // Insert the link to the converted file
+          editor.replaceRange('[[' + file.slice(0, -3) + ']]', editor.getCursor())
+        }
       }
     })
 

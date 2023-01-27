@@ -1,8 +1,9 @@
 import { spawn } from 'child_process'
 import AirQuotes from './main'
 import { Notice } from 'obsidian'
+import { type } from 'os'
 
-export async function convertEpub (plugin: AirQuotes) {
+export async function convertEpub (plugin: AirQuotes): Promise<string | null> {
   const sourceFile = plugin.settings.tempBookSource
 
   // Get just the file name from the full path
@@ -24,12 +25,19 @@ export async function convertEpub (plugin: AirQuotes) {
     'shell': 'cmd.exe',
     'env': {},
   })
-  child_process.on('exit', () => {
-    const stderr = child_process.stderr.read()
-    if (stderr !== null) {
-      console.log(['Error converting file:', stderr.toString(), 'The convert command was:', pandocCommand].join('\n\n'))
-    } else {
-      new Notice(`Successfully converted file to "${newFilename}"`)
-    }
-  })
+  const shellResult = await Promise.race([
+    new Promise(resolve => {
+      child_process.on('exit', () => {
+        const stderr = child_process.stderr.read()
+        if (stderr !== null) {
+          console.log(['Error converting file:', stderr.toString(), 'The convert command was:', pandocCommand].join('\n\n'))
+        } else {
+          new Notice(`Successfully converted file to "${newFilename}"`)
+          resolve(newFilename)
+        }
+      })
+    }),
+    new Promise(resolve => setTimeout(resolve, 3000))
+  ])
+  return typeof shellResult === 'string' ? shellResult : null
 }
