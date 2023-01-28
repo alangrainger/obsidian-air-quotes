@@ -10,11 +10,11 @@ The existing solutions are essentially either:
 
 **Air Quotes** for Obsidian is a method for near-instant inserting of direct quotes from a source text.
 
-Here's a demo from the book I'm currently reading. 
+Here's a demo from the book I'm currently reading:
 
 I've found a great quote which I want to insert. I start typing the first few words of the quote,
 and it instantly finds it in the book. I use the arrow keys to increase/decrease the size of the quote,
-and then hit Enter to insert it into my note:
+and then hit Enter to insert it into my note.
 
 ![](img/demo.gif)
 
@@ -25,7 +25,7 @@ and then hit Enter to insert it into my note:
 You first need a Markdown format version of the book in your vault. This is the source for the quote text.
 
 It's easy to convert pretty much anything to Markdown with [Pandoc](https://pandoc.org/).
-You don't need this plugin to do it - you can do the conversion yourself - but if you are using Windows
+You don't need the Air Quotes plugin to do it - you can do the conversion yourself, but if you are using Windows
 there is a command in the plugin to do the conversion for you (requires Pandoc to be installed first).
 
 #### Step 2
@@ -45,3 +45,19 @@ or the Dataview format:
 source_text:: [[Path/To/Amazing Book]]
 ```
 
+#### Step 3
+
+That's it! Now you can run the "Insert quote" command.
+
+## FAQs
+
+**Does this work on mobile?**
+
+Yes indeed. You'll likely need to add the source text on desktop, as Pandoc isn't supported on mobile, 
+but the insert quote function works just fine.
+
+**Why not use the built-in block link `#^` which already has its own search feature?**
+
+1. I don't like the fuzzy search. If the words you're typing are very common in the book,
+you'll receive a lot of incorrect results, and you might not even find the correct result.
+2. I like the function of increasing/decreasing the size of the quote with the arrow keys.
