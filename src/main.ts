@@ -1,6 +1,7 @@
-import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
+import { convertEpub } from './pandoc'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -22,7 +23,7 @@ export default class AirQuotes extends Plugin {
           // Save the cursor insert position
           this.cursorPosition = editor.getCursor()
           // Parse note data to get YAML field
-          const field = this.settings.bookSource.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
+          const field = this.settings.bookSourceVariable.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
           const regex = `^${field}:{1,2}\\s+\\[\\[(.+?)]]$`
           const contents = await app.vault.cachedRead(view.file)
           const bookPath = contents.match(new RegExp(regex, 'm'))?.[1]
@@ -42,6 +43,22 @@ export default class AirQuotes extends Plugin {
         }
       }
     })
+
+    // Add Pandoc conversion command for desktop users
+    if (Platform.isDesktop) {
+      this.addCommand({
+        id: 'air-quote-pandoc',
+        name: 'Convert book with Pandoc',
+        editorCallback: async (editor: Editor) => {
+          const file = await convertEpub(this)
+          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+          if (file && markdownView) {
+            // Insert the link to the converted file
+            editor.replaceRange('[[' + file.slice(0, -3) + ']]', editor.getCursor())
+          }
+        }
+      })
+    }
   }
 
   onunload () {

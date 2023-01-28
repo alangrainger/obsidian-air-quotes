@@ -2,15 +2,17 @@ import { App, PluginSettingTab, Setting } from 'obsidian'
 import AirQuotes from './main'
 
 export interface AirQuotesSettings {
-  bookSource: string;
+  bookSourceVariable: string;
   outputStyle: string;
   calloutHeader: string;
+  pandocSaveLocation: string;
 }
 
 export const DEFAULT_SETTINGS: AirQuotesSettings = {
-  bookSource: 'source_text',
+  bookSourceVariable: 'source_text',
   outputStyle: 'callout',
-  calloutHeader: '> [!quote]'
+  calloutHeader: '> [!quote]',
+  pandocSaveLocation: ''
 }
 
 export class AirQuotesSettingTab extends PluginSettingTab {
@@ -33,9 +35,19 @@ export class AirQuotesSettingTab extends PluginSettingTab {
       .setDesc('This can be a standard or Dataview frontmatter field')
       .addText(text => text
         .setPlaceholder('source_text')
-        .setValue(this.plugin.settings.bookSource)
+        .setValue(this.plugin.settings.bookSourceVariable)
         .onChange(async (value) => {
-          this.plugin.settings.bookSource = value
+          this.plugin.settings.bookSourceVariable = value
+          await this.plugin.saveSettings()
+        }))
+    new Setting(containerEl)
+      .setName('Pandoc save location')
+      .setDesc('After conversion, save here')
+      .addText(text => text
+        .setPlaceholder('Books in Markdown')
+        .setValue(this.plugin.settings.pandocSaveLocation)
+        .onChange(async (value) => {
+          this.plugin.settings.pandocSaveLocation = value.replace(/^\/+/, '').replace(/\/+$/, '') // remove any leading/trailing slashes
           await this.plugin.saveSettings()
         }))
 
