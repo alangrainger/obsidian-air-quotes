@@ -1,7 +1,6 @@
-import { Editor, EditorPosition, FileSystemAdapter, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
-import { ChildProcess, spawn } from 'child_process'
 import { convertEpub } from './pandoc'
 
 export default class AirQuotes extends Plugin {
@@ -50,7 +49,7 @@ export default class AirQuotes extends Plugin {
       this.addCommand({
         id: 'air-quote-pandoc',
         name: 'Convert book with Pandoc',
-        editorCallback: async (editor: Editor, view: MarkdownView) => {
+        editorCallback: async (editor: Editor) => {
           const file = await convertEpub(this)
           const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
           if (file && markdownView) {

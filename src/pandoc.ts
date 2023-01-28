@@ -41,7 +41,7 @@ export async function convertEpub (plugin: AirQuotes): Promise<string | null> {
     'shell': 'cmd.exe',
     'env': {},
   })
-  const shellResult = await Promise.race([
+  const shellResult = await Promise.race<string>([
     new Promise(resolve => {
       child_process.on('exit', () => {
         const stderr = child_process.stderr.read()
@@ -55,5 +55,5 @@ export async function convertEpub (plugin: AirQuotes): Promise<string | null> {
     }),
     new Promise(resolve => setTimeout(resolve, 3000))
   ])
-  return typeof shellResult === 'string' ? shellResult : null
+  return shellResult || null
 }
