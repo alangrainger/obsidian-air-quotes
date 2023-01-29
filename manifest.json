@@ -3,7 +3,7 @@
 	"name": "Air Quotes",
 	"version": "0.0.3",
 	"minAppVersion": "0.15.0",
-	"description": "Search and insert quotes from a source text as you type",
+	"description": "Search and insert quotes from a source text as you type. This is great for reading a physical book or eReader while taking notes on a separate laptop or phone.",
 	"author": "Alan Grainger",
 	"authorUrl": "https://github.com/alangrainger",
 	"fundingUrl": "https://ko-fi.com/alan_",
