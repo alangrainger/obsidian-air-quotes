@@ -1,7 +1,7 @@
 {
 	"name": "air-quotes",
-	"version": "0.0.2",
-	"description": "",
+	"version": "0.0.3",
+	"description": "Search and insert quotes from a source text as you type",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
