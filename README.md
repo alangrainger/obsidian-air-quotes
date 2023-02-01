@@ -18,6 +18,10 @@ and then hit Enter to insert it into my note.
 
 ![](img/demo.gif)
 
+Here's a demo with a print book. The caveat of course is that you also need an ebook copy. It's a great experience doing this with a mobile device - makes for very quick note taking.
+
+[![](img/video-demo.jpg)](https://www.youtube.com/watch?v=G-hpPOMCQys)
+
 ## How it works
 
 #### Step 1
