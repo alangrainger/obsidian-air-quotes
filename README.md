@@ -1,5 +1,9 @@
 # Air Quotes plugin
 
+![](https://img.shields.io/github/license/alangrainger/obsidian-air-quotes) ![](https://img.shields.io/github/v/release/alangrainger/obsidian-air-quotes?style=flat-square) ![](https://img.shields.io/github/downloads/alangrainger/obsidian-air-quotes/total)
+
+<a href="https://ko-fi.com/alan_" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" style="width:190px"></a>
+
 I love reading paper books or on eReader devices while taking notes on my laptop or phone, 
 but it massively interrupts my flow to capture quotes from the book.
 
