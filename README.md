@@ -44,9 +44,9 @@ pandoc -s "c:\Path\To\Source.epub" -t markdown_strict-raw_html-native_divs-nativ
 
 #### Step 2
 
-Link the source text note to your current note in a YAML format. This is the Markdown (or plaint text) formatted note inside your Obsidian vault.
+Link the source text note to your current note. This is the Markdown (or plain text) formatted note inside your Obsidian vault.
 
-You can use either the standard format:
+You can use either the standard YAML format:
 
 ```
 ---
