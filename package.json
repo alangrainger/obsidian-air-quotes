@@ -1,7 +1,7 @@
 {
 	"name": "air-quotes",
-	"version": "0.0.3",
-	"description": "Search and insert quotes from a source text as you type",
+	"version": "0.0.4",
+	"description": "Search and insert quotes from a source text as you type. This is great for reading a physical book or eReader while taking notes on a separate laptop or phone.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

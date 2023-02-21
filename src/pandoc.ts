@@ -1,3 +1,8 @@
+/*
+ * Code to run shell commands was assisted by Obsidian Shell Commands plugin:
+ * https://github.com/Taitava/obsidian-shellcommands
+ */
+
 import { spawn } from 'child_process'
 import AirQuotes from './main'
 import { Notice, Platform } from 'obsidian'

@@ -14,7 +14,7 @@ export default class AirQuotes extends Plugin {
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
 
     this.addCommand({
-      id: 'air-quote-insert',
+      id: 'insert',
       name: 'Insert quote',
       editorCallback: async (editor: Editor, view: MarkdownView) => {
         const markdownView = app.workspace.getActiveViewOfType(MarkdownView)
@@ -45,9 +45,10 @@ export default class AirQuotes extends Plugin {
     })
 
     // Add Pandoc conversion command for desktop users
-    if (Platform.isDesktop) {
+    // This is Windows-only currently
+    if (process.platform === 'win32' && Platform.isDesktop) {
       this.addCommand({
-        id: 'air-quote-pandoc',
+        id: 'pandoc',
         name: 'Convert book with Pandoc',
         editorCallback: async (editor: Editor) => {
           const file = await convertEpub(this)
