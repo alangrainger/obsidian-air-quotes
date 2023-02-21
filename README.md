@@ -36,6 +36,12 @@ It's easy to convert pretty much anything to Markdown with [Pandoc](https://pand
 You don't need the Air Quotes plugin to do it - you can do the conversion yourself, but if you are using Windows
 there is a command in the plugin to do the conversion for you (requires Pandoc to be installed first).
 
+The specific Pandoc command I'm using in Windows is:
+
+```
+pandoc -s "c:\Path\To\Source.epub" -t markdown_strict-raw_html-native_divs-native_spans-fenced_divs-bracketed_spans --wrap=none -o "c:\Obsidian folder\Some\Path\Output.md"
+```
+
 #### Step 2
 
 Link the source text to your current note in a YAML format. You can use either the standard
