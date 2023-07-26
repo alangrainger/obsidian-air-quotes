@@ -1,6 +1,6 @@
 {
 	"name": "air-quotes",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Search and insert quotes from a source text as you type. This is great for reading a physical book or eReader while taking notes on a separate laptop or phone.",
 	"main": "main.js",
 	"scripts": {

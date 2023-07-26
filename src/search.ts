@@ -38,7 +38,7 @@ export class SearchModal extends SuggestModal<any> {
       return matches.map(match => {
         // Add previews of all matches
         const start = match.index || 0
-        return {index: start, text: this.sourceText.slice(start, start + 200) + '...'}
+        return { index: start, text: this.sourceText.slice(start, start + 200) + '...' }
       }).slice(0, 5)
     } else {
       return []
@@ -62,37 +62,40 @@ export class QuoteModal extends Modal {
   plugin: AirQuotes
   sentences: string[]
   component: Component = new Component()
-  index: number = 5
+  index: number
   eventListener: EventListener
 
   constructor (plugin: AirQuotes, text: string) {
     super(plugin.app)
     this.plugin = plugin
+    this.index = 5 // The initial number of sentences to display for a quote
     // Split the incoming text into sentences
     this.sentences = [...text.matchAll(/.+?[.?!\n]['"’”]?\s+(?=[“‘"']?[A-Z])/sg)].map(x => x[0])
   }
 
   async onOpen () {
-    const {modalEl} = this
+    const { modalEl } = this
+
+    // Add CSS classes depending on desktop/mobile
     if (Platform.isMobile) {
       modalEl.addClass('air-quotes-select-modal-mobile')
     } else {
       modalEl.addClass('air-quotes-select-modal-desktop')
     }
+
     this.titleEl.setText('Select quote')
     // Set the initial quote text
     await this.setModalContents()
-    this.eventListener = (event: KeyboardEvent) => this.onKeyPress(event)
-    window.addEventListener('keydown', this.eventListener)
+    this.registerListeners()
     if (Platform.isMobile) {
-      const buttons = modalEl.createEl('div', {cls: 'air-quotes-select-buttons'})
-      // Add the increment/decrement buttons
+      const buttons = modalEl.createEl('div', { cls: 'air-quotes-select-buttons' })
+      // Add the increment/decrement mobile buttons
       const values = ['-5', '-1', '+1', '+5']
       values.forEach((value: string) => {
-        buttons.createEl('button', {text: value}, button => button.onclick = () => this.updateIndex(+value))
+        buttons.createEl('button', { text: value }, button => button.onclick = () => this.updateIndex(+value))
       })
       // Add the "Insert quote" button
-      buttons.createEl('button', {text: '✅'}, button => button.onclick = () => this.insertTextIntoEditor())
+      buttons.createEl('button', { text: '✅' }, button => button.onclick = () => this.insertTextIntoEditor())
     }
   }
 
@@ -109,26 +112,23 @@ export class QuoteModal extends Modal {
 
   /**
    * Listen for arrow key events, and increase/decrease the quote selection
-   * @param event
    */
-  onKeyPress (event: KeyboardEvent) {
-    switch (event.key) {
-      case 'ArrowDown':
-        this.updateIndex(5)
-        break
-      case 'ArrowUp':
-        this.updateIndex(-5)
-        break
-      case 'ArrowLeft':
-        this.updateIndex(-1)
-        break
-      case 'ArrowRight':
-        this.updateIndex(1)
-        break
-      case 'Enter':
-        this.insertTextIntoEditor().then()
-        break
-    }
+  registerListeners () {
+    this.scope.register([], 'Arrowdown', () => {
+      this.updateIndex(5)
+    })
+    this.scope.register([], 'ArrowUp', () => {
+      this.updateIndex(-5)
+    })
+    this.scope.register([], 'ArrowLeft', () => {
+      this.updateIndex(-1)
+    })
+    this.scope.register([], 'ArrowRight', () => {
+      this.updateIndex(1)
+    })
+    this.scope.register([], 'Enter', () => {
+      this.insertTextIntoEditor().then()
+    })
   }
 
   /**
@@ -170,10 +170,11 @@ export class QuoteModal extends Modal {
     const text = this.formatAsFinalMarkdownOutput()
     await this.close()
     this.plugin.editor.replaceRange(text, this.plugin.cursorPosition)
-    this.plugin.editor.setCursor({line: this.plugin.cursorPosition.line + text.split('\n').length, ch: 0})
+    this.plugin.editor.setCursor({ line: this.plugin.cursorPosition.line + text.split('\n').length, ch: 0 })
   }
 
   onClose () {
     window.removeEventListener('keydown', this.eventListener)
+    this.component.unload()
   }
 }
