@@ -30,17 +30,7 @@ Here's a demo with a print book. The caveat of course is that you also need an e
 
 #### Step 1
 
-You first need a Markdown format version of the book in your vault. This is the source for the quote text.
-
-It's easy to convert pretty much anything to Markdown with [Pandoc](https://pandoc.org/).
-You don't need the Air Quotes plugin to do it - you can do the conversion yourself, but if you are using Windows
-there is a command in the plugin to do the conversion for you (requires Pandoc to be installed first).
-
-The specific Pandoc command I'm using in Windows is:
-
-```
-pandoc -s "c:\Path\To\Source.epub" -t markdown_strict-raw_html-native_divs-native_spans-fenced_divs-bracketed_spans --wrap=none -o "c:\Obsidian folder\Some\Path\Output.md"
-```
+You first need a Markdown format version of the book in your vault. This is the source for the quote text. See the docs on [how to convert your books to Markdown](docs/Converting%20books%20to%20Markdown.md).
 
 #### Step 2
 
