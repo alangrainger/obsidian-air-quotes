@@ -40,14 +40,14 @@ You can use either the standard YAML format:
 
 ```
 ---
-source_text: "[[Path/To/Amazing Book]]"
+source_text: "[[link/to/Amazing Book]]"
 ---
 ```
 
 Or the Dataview format:
 
 ```
-source_text:: [[Path/To/Amazing Book]]
+source_text:: [[link/to/Amazing Book]]
 ```
 
 #### Step 3
