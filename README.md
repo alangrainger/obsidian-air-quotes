@@ -40,7 +40,7 @@ You can use either the standard YAML format:
 
 ```
 ---
-source_text: [[Path/To/Amazing Book]]
+source_text: "[[Path/To/Amazing Book]]"
 ---
 ```
 
