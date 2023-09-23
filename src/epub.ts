@@ -2,6 +2,7 @@ import { htmlToMarkdown, TFile } from 'obsidian'
 import AdmZip from 'adm-zip'
 import * as xmljs from 'xml-js'
 
+// The ePub manifest format as extracted by xml-js
 interface EpubManifest {
   package: {
     manifest: {
@@ -47,26 +48,28 @@ export class Epub {
     // Convert the book to Markdown
     let contents = ''
     for (const tocItem of toc) {
-      const file = files.find(entry => entry.entryName === 'OEBPS/' + tocItem)
+      const file = files.find(entry => entry.entryName.endsWith(tocItem))
       const html = file?.getData().toString('utf8') || ''
       contents += htmlToMarkdown(html)
     }
 
     // Write the new note
     // Filename in the format of <Title - Author.md>
-    const noteFilename = this.getMetadataValue('title') + ' - ' + this.getMetadataValue('creator') + '.md'
+    const noteFilename = this.metadataValue('title') + ' - ' + this.metadataValue('creator') + '.md'
     if (await app.vault.adapter.exists(noteFilename)) {
       const outputFile = app.vault.getAbstractFileByPath(noteFilename)
       if (outputFile instanceof TFile) {
+        // Replace the existing file
         await app.vault.modify(outputFile, contents)
       }
     } else {
+      // Create a new file
       await app.vault.create(noteFilename, contents)
     }
     return noteFilename
   }
 
-  getMetadataValue (key: string) {
+  metadataValue (key: string) {
     return this.manifest?.package?.metadata?.['dc:' + key]?._text || ''
   }
 }
