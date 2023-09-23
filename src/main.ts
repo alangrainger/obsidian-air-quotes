@@ -1,7 +1,6 @@
-import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
-import { convertEpub } from './pandoc'
 import { Epub } from './epub'
 
 export default class AirQuotes extends Plugin {
@@ -13,9 +12,6 @@ export default class AirQuotes extends Plugin {
   async onload () {
     await this.loadSettings()
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
-
-    const test = new Epub()
-    await test.convertToMarkdown()
 
     this.addCommand({
       id: 'insert',
@@ -53,7 +49,8 @@ export default class AirQuotes extends Plugin {
       id: 'convert-epub',
       name: 'Convert ePub file to a new note',
       editorCallback: async (editor: Editor) => {
-        const epub = new Epub()
+        const path = prompt('Enter the full path to the file')
+        const epub = new Epub(path || '')
         const filename = await epub.convertToMarkdown()
         const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (filename && markdownView) {

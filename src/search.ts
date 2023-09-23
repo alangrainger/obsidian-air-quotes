@@ -136,7 +136,7 @@ export class QuoteModal extends Modal {
    */
   async setModalContents () {
     this.contentEl.empty()
-    const helpText = Platform.isDesktop ? `*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n` : ''
+    const helpText = Platform.isDesktop ? '*Use the arrow keys to change the selection size of the quote, and Enter to insert.*\n\n' : ''
     const text = helpText + this.formatAsFinalMarkdownOutput()
     // I'm  not sure what sourcePath and component do here, but they are required parameters for renderMarkdown()
     await MarkdownRenderer.renderMarkdown(text, this.contentEl, '', this.component)

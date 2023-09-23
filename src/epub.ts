@@ -1,6 +1,5 @@
 import { htmlToMarkdown, TFile } from 'obsidian'
 import AdmZip from 'adm-zip'
-
 import * as xmljs from 'xml-js'
 
 interface EpubManifest {
@@ -22,9 +21,14 @@ interface EpubManifest {
 
 export class Epub {
   manifest: EpubManifest
+  path: string
+
+  constructor (path: string) {
+    this.path = path
+  }
 
   async convertToMarkdown () {
-    const zip = new AdmZip('c:/temp/Never Split the Difference - Chris Voss.epub')
+    const zip = new AdmZip(this.path)
     const files = zip.getEntries() // an array of ZipEntry records
 
     // Find the index file

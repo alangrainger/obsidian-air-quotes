@@ -24,11 +24,11 @@ export class AirQuotesSettingTab extends PluginSettingTab {
   }
 
   display (): void {
-    const {containerEl} = this
+    const { containerEl } = this
 
     containerEl.empty()
 
-    containerEl.createEl('h2', {text: 'Air Quotes settings'})
+    containerEl.createEl('h2', { text: 'Air Quotes settings' })
 
     new Setting(containerEl)
       .setName('Book source field')
