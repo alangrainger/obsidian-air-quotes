@@ -3,6 +3,7 @@ import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './sett
 import { SearchModal } from './search'
 import { convertEpub } from './pandoc'
 import { getAPI } from 'obsidian-dataview'
+import { Epub } from './epub'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -13,6 +14,9 @@ export default class AirQuotes extends Plugin {
   async onload () {
     await this.loadSettings()
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
+
+    const test = new Epub()
+    await test.convertToMarkdown()
 
     this.addCommand({
       id: 'insert',
