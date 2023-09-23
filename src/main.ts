@@ -2,7 +2,6 @@ import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile }
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
 import { convertEpub } from './pandoc'
-import { getAPI } from 'obsidian-dataview'
 import { Epub } from './epub'
 
 export default class AirQuotes extends Plugin {
@@ -29,20 +28,9 @@ export default class AirQuotes extends Plugin {
           this.cursorPosition = editor.getCursor()
 
           // Get the location for the note containing the source text
-          let bookPath
-          // Attempt to get from Dataview first
-          const dv = getAPI(app)
-          const yaml = dv?.page(view.file.path)
-          const yamlField = yaml?.[this.settings.bookSourceVariable]?.path
-          if (yamlField) {
-            bookPath = yamlField
-          } else {
-            // If this fails, fall back to regex
-            const field = this.settings.bookSourceVariable.replace(/[/\-^$*+?.()|[\]{}]/g, '/$&')
-            const regex = `^${field}:{1,2}\\s+"?\\[\\[(.+?)]]$`
-            const contents = await app.vault.cachedRead(view.file)
-            bookPath = contents.match(new RegExp(regex, 'm'))?.[1]
-          }
+          const metadata = app.metadataCache.getFileCache(view.file)
+          // @ts-ignore
+          const bookPath = metadata?.frontmatterLinks?.find(x => x.key === this.settings.bookSourceVariable)?.link
 
           if (!bookPath) {
             // No matching YAML/frontmatter field was found
@@ -61,23 +49,19 @@ export default class AirQuotes extends Plugin {
       }
     })
 
-    // Add Pandoc conversion command for desktop users
-    // This is Windows-only currently
-    // I would like to change this to use Platform.isWin, but it doesn't appear to be in the definitions yet
-    if (process.platform === 'win32' && Platform.isDesktop) {
-      this.addCommand({
-        id: 'pandoc',
-        name: 'Convert book with Pandoc',
-        editorCallback: async (editor: Editor) => {
-          const file = await convertEpub(this)
-          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-          if (file && markdownView) {
-            // Insert the link to the converted file
-            editor.replaceRange('[[' + file.slice(0, -3) + ']]', editor.getCursor())
-          }
+    this.addCommand({
+      id: 'convert-epub',
+      name: 'Convert ePub file to a new note',
+      editorCallback: async (editor: Editor) => {
+        const epub = new Epub()
+        const filename = await epub.convertToMarkdown()
+        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (filename && markdownView) {
+          // Insert the link to the converted file
+          editor.replaceRange('[[' + filename.slice(0, -3) + ']]', editor.getCursor())
         }
-      })
-    }
+      }
+    })
   }
 
   async loadSettings () {

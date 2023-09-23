@@ -59,6 +59,7 @@ export class Epub {
     } else {
       await app.vault.create(noteFilename, contents)
     }
+    return noteFilename
   }
 
   getMetadataValue (key: string) {
