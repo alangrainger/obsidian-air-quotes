@@ -1,4 +1,4 @@
-import { App, htmlToMarkdown, Notice, TFile } from 'obsidian'
+import { htmlToMarkdown, Notice, TFile } from 'obsidian'
 import AdmZip from 'adm-zip'
 import * as xmljs from 'xml-js'
 import AirQuotes from './main'
