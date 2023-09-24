@@ -1,6 +1,7 @@
-import { htmlToMarkdown, TFile } from 'obsidian'
+import { App, htmlToMarkdown, Notice, TFile } from 'obsidian'
 import AdmZip from 'adm-zip'
 import * as xmljs from 'xml-js'
+import AirQuotes from './main'
 
 // The ePub manifest format as extracted by xml-js
 interface EpubManifest {
@@ -20,31 +21,56 @@ interface EpubManifest {
   }
 }
 
-export class Epub {
-  manifest: EpubManifest
-  files: AdmZip.IZipEntry[]
+interface EpubContainer {
+  container: {
+    rootfiles: {
+      rootfile: {
+        _attributes: {
+          'full-path': string
+        }
+      }
+    }
+  }
+}
 
-  constructor (path: string) {
-    this.path = path
+export class Epub {
+  plugin: AirQuotes
+  manifest: EpubManifest
+  zipfiles: AdmZip.IZipEntry[]
+  containerFile: AdmZip.IZipEntry
+
+  constructor (plugin: AirQuotes, path: string) {
+    this.plugin = plugin
     const zip = new AdmZip(path)
-    this.files = zip.getEntries() // an array of ZipEntry records
+    this.zipfiles = zip.getEntries()
+    this.processMetaInf()
+  }
+
+  /**
+   * Returns the XML content of a zipfile as a JSON object
+   */
+  zipfileToJson (zipfile: AdmZip.IZipEntry | undefined) {
+    const xmlData = zipfile?.getData().toString('utf8') || ''
+    return xmljs.xml2js(xmlData, {
+      compact: true,
+      trim: true
+    }) || {}
   }
 
   processMetaInf () {
-    const indexFile = this.files.find(entry => entry.entryName.match(/^META-INF\/container.xml$/i))
-    console.log(indexFile)
+    const indexFile = this.zipfiles.find(entry => entry.entryName.match(/^META-INF\/container.xml$/i))
+    const data = this.zipfileToJson(indexFile) as EpubContainer
+    const file = this.zipfiles.find(entry => entry.entryName === data.container.rootfiles.rootfile._attributes['full-path'])
+    if (file) this.containerFile = file
   }
 
   async convertToMarkdown () {
-    // Find the index file
-    const indexFile = this.files.find(entry => entry.entryName.match(/^OEBPS\/[^/]+\.opf$/i))
-    if (!indexFile) return
+    if (!this.containerFile) return
+
+    new Notice('Importing book...')
 
     // Parse the manifest from XML
-    this.manifest = xmljs.xml2js(indexFile.getData().toString('utf8'), {
-      compact: true,
-      trim: true
-    }) as EpubManifest
+    this.manifest = this.zipfileToJson(this.containerFile) as EpubManifest
 
     // Extract the list of book content files from the manifest
     const toc = this.manifest.package.manifest.item
@@ -54,9 +80,16 @@ export class Epub {
     // Convert the book to Markdown
     let contents = ''
     for (const tocItem of toc) {
-      const file = files.find(entry => entry.entryName.endsWith(tocItem))
+      const file = this.zipfiles.find(entry => entry.entryName.endsWith(tocItem))
       const html = file?.getData().toString('utf8') || ''
       contents += htmlToMarkdown(html)
+    }
+
+    // Check for destination folder
+    let folder = ''
+    if (this.plugin.settings.importLocation && !await this.plugin.app.vault.adapter.exists(this.plugin.settings.importLocation)) {
+      await this.plugin.app.vault.createFolder(this.plugin.settings.importLocation)
+      folder = this.plugin.settings.importLocation + '/'
     }
 
     // Write the new note
@@ -64,8 +97,8 @@ export class Epub {
     const titleParts = []
     if (this.metadataValue('title')) titleParts.push(this.metadataValue('title'))
     if (this.metadataValue('creator')) titleParts.push(this.metadataValue('creator'))
-    const noteFilename = titleParts.join(' - ') + '.md'
-    console.log(noteFilename)
+    const title = titleParts.join(' - ')
+    const noteFilename = folder + title + '.md'
     if (await app.vault.adapter.exists(noteFilename)) {
       const outputFile = app.vault.getAbstractFileByPath(noteFilename)
       if (outputFile instanceof TFile) {
@@ -76,6 +109,7 @@ export class Epub {
       // Create a new file
       await app.vault.create(noteFilename, contents)
     }
+    new Notice('✔ Successfully imported ' + title)
     return noteFilename
   }
 

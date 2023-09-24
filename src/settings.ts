@@ -5,14 +5,14 @@ export interface AirQuotesSettings {
   bookSourceVariable: string;
   outputStyle: string;
   calloutHeader: string;
-  pandocSaveLocation: string;
+  importLocation: string;
 }
 
 export const DEFAULT_SETTINGS: AirQuotesSettings = {
   bookSourceVariable: 'source_text',
   outputStyle: 'callout',
   calloutHeader: '> [!quote]',
-  pandocSaveLocation: ''
+  importLocation: ''
 }
 
 export class AirQuotesSettingTab extends PluginSettingTab {
@@ -31,23 +31,23 @@ export class AirQuotesSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Air Quotes settings' })
 
     new Setting(containerEl)
-      .setName('Book source field')
-      .setDesc('This can be a standard or Dataview frontmatter field')
+      .setName('Book source property')
+      .setDesc('The frontmatter property which will contain a link to your source text note.')
       .addText(text => text
         .setPlaceholder('source_text')
         .setValue(this.plugin.settings.bookSourceVariable)
-        .onChange(async (value) => {
+        .onChange(async value => {
           this.plugin.settings.bookSourceVariable = value
           await this.plugin.saveSettings()
         }))
     new Setting(containerEl)
-      .setName('Pandoc save location')
-      .setDesc('After conversion, save here')
+      .setName('Import book location')
+      .setDesc('After importing an ePub, the converted Markdown note will be saved into this folder.')
       .addText(text => text
         .setPlaceholder('Books in Markdown')
-        .setValue(this.plugin.settings.pandocSaveLocation)
-        .onChange(async (value) => {
-          this.plugin.settings.pandocSaveLocation = value.replace(/^\/+/, '').replace(/\/+$/, '') // remove any leading/trailing slashes
+        .setValue(this.plugin.settings.importLocation)
+        .onChange(async value => {
+          this.plugin.settings.importLocation = value.replace(/^\/+/, '').replace(/\/+$/, '') // remove any leading/trailing slashes
           await this.plugin.saveSettings()
         }))
 
@@ -71,7 +71,7 @@ export class AirQuotesSettingTab extends PluginSettingTab {
       .addText(text => text
         .setPlaceholder('> [!quote]')
         .setValue(this.plugin.settings.calloutHeader)
-        .onChange(async (value) => {
+        .onChange(async value => {
           this.plugin.settings.calloutHeader = value
           await this.plugin.saveSettings()
         }))

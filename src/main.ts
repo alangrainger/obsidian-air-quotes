@@ -2,6 +2,7 @@ import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obs
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
 import { Epub } from './epub'
+import { FileModal } from './FileModal'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -45,20 +46,25 @@ export default class AirQuotes extends Plugin {
       }
     })
 
+    // Import an ePub into your Vault as a new Markdown note
     this.addCommand({
       id: 'convert-epub',
-      name: 'Convert ePub file to a new note',
-      editorCallback: async (editor: Editor) => {
-        const path = 'C:/Users/Alan/Downloads/pg10-images-3.epub'
-        const epub = new Epub(path || '')
-        const filename = await epub.convertToMarkdown()
-        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-        if (filename && markdownView) {
-          // Insert the link to the converted file
-          await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
-            frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
-          })
-        }
+      name: 'Import/Convert ePub file',
+      callback: async () => {
+        const modal = new FileModal(app)
+        modal.onFileSelect(async file => {
+          modal.close()
+          const epub = new Epub(this, file.path || '')
+          const filename = await epub.convertToMarkdown()
+          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+          if (filename && markdownView) {
+            // Insert the link to the converted file
+            await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
+              frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
+            })
+          }
+        })
+        modal.open()
       }
     })
   }
