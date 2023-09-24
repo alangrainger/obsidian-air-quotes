@@ -22,18 +22,22 @@ interface EpubManifest {
 
 export class Epub {
   manifest: EpubManifest
-  path: string
+  files: AdmZip.IZipEntry[]
 
   constructor (path: string) {
     this.path = path
+    const zip = new AdmZip(path)
+    this.files = zip.getEntries() // an array of ZipEntry records
+  }
+
+  processMetaInf () {
+    const indexFile = this.files.find(entry => entry.entryName.match(/^META-INF\/container.xml$/i))
+    console.log(indexFile)
   }
 
   async convertToMarkdown () {
-    const zip = new AdmZip(this.path)
-    const files = zip.getEntries() // an array of ZipEntry records
-
     // Find the index file
-    const indexFile = files.find(entry => entry.entryName.match(/^OEBPS\/[^/]+\.opf$/i))
+    const indexFile = this.files.find(entry => entry.entryName.match(/^OEBPS\/[^/]+\.opf$/i))
     if (!indexFile) return
 
     // Parse the manifest from XML
@@ -46,7 +50,6 @@ export class Epub {
     const toc = this.manifest.package.manifest.item
       .map(item => item._attributes.href)
       .filter(item => item.match(/\.x?html$/))
-    console.log(toc)
 
     // Convert the book to Markdown
     let contents = ''

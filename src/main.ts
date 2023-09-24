@@ -10,7 +10,6 @@ export default class AirQuotes extends Plugin {
   cursorPosition: EditorPosition
 
   async onload () {
-    console.log('test')
     await this.loadSettings()
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
 
@@ -56,7 +55,9 @@ export default class AirQuotes extends Plugin {
         const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (filename && markdownView) {
           // Insert the link to the converted file
-          editor.replaceRange('[[' + filename.slice(0, -3) + ']]', editor.getCursor())
+          await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
+            frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
+          })
         }
       }
     })
