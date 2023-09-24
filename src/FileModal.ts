@@ -1,11 +1,11 @@
 import { Modal } from 'obsidian'
 
-interface FileWithPath extends File {
+export interface HTMLInputFile extends File {
   path: string
 }
 
 export class FileModal extends Modal {
-  private fileSelectCallback: (file: FileWithPath) => void
+  private fileSelectCallback: (file: HTMLInputFile) => void
 
   onOpen (): void {
     this.titleEl.setText('Choose an ePub file to import')
@@ -15,7 +15,7 @@ export class FileModal extends Modal {
     inputEl.accept = 'application/epub+zip'
     inputEl.onchange = (ev) => {
       try {
-        const file = (ev.target as HTMLInputElement)?.files?.[0] as FileWithPath
+        const file = (ev.target as HTMLInputElement)?.files?.[0] as HTMLInputFile
         this.fileSelectCallback(file)
       } catch (e) {
         console.log(e)
@@ -23,7 +23,7 @@ export class FileModal extends Modal {
     }
   }
 
-  onFileSelect (callback: (file: FileWithPath) => void) {
+  onFileSelect (callback: (file: HTMLInputFile) => void) {
     this.fileSelectCallback = callback
   }
 }

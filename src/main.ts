@@ -1,8 +1,8 @@
 import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
-import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
-import { SearchModal } from './search'
-import { Epub } from './epub'
-import { FileModal } from './FileModal'
+import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './Settings'
+import { SearchModal } from './Search'
+import { FileModal, HTMLInputFile } from './FileModal'
+import { Epub } from './Epub'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -34,6 +34,7 @@ export default class AirQuotes extends Plugin {
             new Notice('No source path found in YAML/frontmatter. Make sure to link to your source text.')
             return
           }
+
           // Attempt to resolve the link text into a matching TFile
           const bookFile = app.metadataCache.getFirstLinkpathDest(bookPath, view.file.path)
           if (bookFile) {
@@ -52,13 +53,19 @@ export default class AirQuotes extends Plugin {
       name: 'Import/Convert ePub file',
       callback: async () => {
         const modal = new FileModal(app)
-        modal.onFileSelect(async file => {
+        modal.onFileSelect(async (file: HTMLInputFile) => {
           modal.close()
-          const epub = new Epub(this, file.path || '')
+
+          // Take the HTML file input and injest the zip data
+          const epub = new Epub(this)
+          await epub.processHtmlInputFile(file)
+
+          // Convert the provided file to Markdown
           const filename = await epub.convertToMarkdown()
+
+          // Insert the link to the converted file if we're in editing mode
           const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
           if (filename && markdownView) {
-            // Insert the link to the converted file
             await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
               frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
             })
