@@ -69,7 +69,7 @@ export class Epub {
   }
 
   async convertToMarkdown () {
-    if (!this.containerFile) return
+    if (!this.containerFile) return ''
 
     new Notice('Importing book...')
 

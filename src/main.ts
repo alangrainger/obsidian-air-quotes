@@ -1,4 +1,4 @@
-import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './Settings'
 import { SearchModal } from './Search'
 import { FileModal, HTMLInputFile } from './FileModal'
@@ -56,9 +56,21 @@ export default class AirQuotes extends Plugin {
         const modal = new FileModal(app)
         modal.onFileSelect(async (file: HTMLInputFile) => {
           modal.close()
+
+          // Take the HTML file input and injest the zip data
           const epub = new Epub(this)
           await epub.processHtmlInputFile(file)
-          await epub.convertToMarkdown()
+
+          // Convert the provided file to Markdown
+          const filename = await epub.convertToMarkdown()
+
+          // Insert the link to the converted file if we're in editing mode
+          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+          if (filename && markdownView) {
+            await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
+              frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
+            })
+          }
         })
         modal.open()
       }
