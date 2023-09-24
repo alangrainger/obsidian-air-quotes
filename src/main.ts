@@ -1,6 +1,6 @@
 import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
-import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
-import { SearchModal } from './search'
+import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './Settings'
+import { SearchModal } from './Search'
 import { FileModal, FileWithPath } from './FileModal'
 
 export default class AirQuotes extends Plugin {
@@ -46,30 +46,31 @@ export default class AirQuotes extends Plugin {
     })
 
     // Import an ePub into your Vault as a new Markdown note
-    this.addCommand({
-      id: 'convert-epub',
-      name: 'Import/Convert ePub file',
-      callback: async () => {
-        if (Platform.isMobile) return
-        const modal = new FileModal(app)
-        modal.onFileSelect(async (file: FileWithPath) => {
-          modal.close()
-          // Only require the file here so that we DON'T load it on mobile.
-          // I was unable to find any unzip solution that works for mobile.
-          const Epub = require('./epub')
-          const epub = new Epub(this, file.path || '')
-          const filename = await epub.convertToMarkdown()
-          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-          if (filename && markdownView) {
-            // Insert the link to the converted file
-            await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
-              frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
-            })
-          }
-        })
-        modal.open()
-      }
-    })
+    if (Platform.isDesktop) {
+      this.addCommand({
+        id: 'convert-epub',
+        name: 'Import/Convert ePub file',
+        callback: async () => {
+          const modal = new FileModal(app)
+          modal.onFileSelect(async (file: FileWithPath) => {
+            modal.close()
+            // Only require the file here so that we DON'T load it on mobile.
+            // I was unable to find any unzip solution that works for mobile.
+            const Epub = require('./Epub').Epub
+            const doc = new Epub(this, file.path || '')
+            const filename = await doc.convertToMarkdown()
+            const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
+            if (filename && markdownView) {
+              // Insert the link to the converted file
+              await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
+                frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
+              })
+            }
+          })
+          modal.open()
+        }
+      })
+    }
   }
 
   async loadSettings () {
