@@ -43,7 +43,10 @@ export class Epub {
     }) as EpubManifest
 
     // Extract the list of book content files from the manifest
-    const toc = this.manifest.package.manifest.item.map(item => item._attributes.href)
+    const toc = this.manifest.package.manifest.item
+      .map(item => item._attributes.href)
+      .filter(item => item.match(/\.x?html$/))
+    console.log(toc)
 
     // Convert the book to Markdown
     let contents = ''
@@ -55,7 +58,11 @@ export class Epub {
 
     // Write the new note
     // Filename in the format of <Title - Author.md>
-    const noteFilename = this.metadataValue('title') + ' - ' + this.metadataValue('creator') + '.md'
+    const titleParts = []
+    if (this.metadataValue('title')) titleParts.push(this.metadataValue('title'))
+    if (this.metadataValue('creator')) titleParts.push(this.metadataValue('creator'))
+    const noteFilename = titleParts.join(' - ') + '.md'
+    console.log(noteFilename)
     if (await app.vault.adapter.exists(noteFilename)) {
       const outputFile = app.vault.getAbstractFileByPath(noteFilename)
       if (outputFile instanceof TFile) {

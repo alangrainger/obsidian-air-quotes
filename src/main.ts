@@ -10,6 +10,7 @@ export default class AirQuotes extends Plugin {
   cursorPosition: EditorPosition
 
   async onload () {
+    console.log('test')
     await this.loadSettings()
     this.addSettingTab(new AirQuotesSettingTab(this.app, this))
 
@@ -49,7 +50,7 @@ export default class AirQuotes extends Plugin {
       id: 'convert-epub',
       name: 'Convert ePub file to a new note',
       editorCallback: async (editor: Editor) => {
-        const path = prompt('Enter the full path to the file')
+        const path = 'C:/Users/Alan/Downloads/pg10-images-3.epub'
         const epub = new Epub(path || '')
         const filename = await epub.convertToMarkdown()
         const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
