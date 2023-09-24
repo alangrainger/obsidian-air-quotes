@@ -1,6 +1,6 @@
 import { Modal } from 'obsidian'
 
-interface FileWithPath extends File {
+export interface FileWithPath extends File {
   path: string
 }
 

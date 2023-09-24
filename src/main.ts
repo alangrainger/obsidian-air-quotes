@@ -1,8 +1,7 @@
-import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
+import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './settings'
 import { SearchModal } from './search'
-import { Epub } from './epub'
-import { FileModal } from './FileModal'
+import { FileModal, FileWithPath } from './FileModal'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -51,9 +50,13 @@ export default class AirQuotes extends Plugin {
       id: 'convert-epub',
       name: 'Import/Convert ePub file',
       callback: async () => {
+        if (Platform.isMobile) return
         const modal = new FileModal(app)
-        modal.onFileSelect(async file => {
+        modal.onFileSelect(async (file: FileWithPath) => {
           modal.close()
+          // Only require the file here so that we DON'T load it on mobile.
+          // I was unable to find any unzip solution that works for mobile.
+          const Epub = require('./epub')
           const epub = new Epub(this, file.path || '')
           const filename = await epub.convertToMarkdown()
           const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
