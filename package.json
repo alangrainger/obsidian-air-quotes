@@ -16,7 +16,7 @@
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
-		"adm-zip": "^0.5.10",
+		"jszip": "^3.10.1",
 		"xml-js": "^1.6.11",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.14.47",

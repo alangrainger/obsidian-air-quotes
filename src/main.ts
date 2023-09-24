@@ -1,7 +1,8 @@
 import { Editor, EditorPosition, MarkdownView, Notice, Platform, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './Settings'
 import { SearchModal } from './Search'
-import { FileModal, FileWithPath } from './FileModal'
+import { FileModal, HTMLInputFile } from './FileModal'
+import { Epub } from './Epub'
 
 export default class AirQuotes extends Plugin {
   settings: AirQuotesSettings
@@ -48,34 +49,20 @@ export default class AirQuotes extends Plugin {
 
     // Import an ePub into your Vault as a new Markdown note
     // This is not available on mobile
-    if (Platform.isDesktop) {
-      this.addCommand({
-        id: 'convert-epub',
-        name: 'Import/Convert ePub file',
-        callback: async () => {
-          const modal = new FileModal(app)
-          modal.onFileSelect(async (file: FileWithPath) => {
-            modal.close()
-            // Only require the file here so that we DON'T load it on mobile.
-            // I was unable to find any unzip solution that works for mobile.
-            const Epub = require('./Epub').Epub
-            const doc = new Epub(this, file.path || '')
-
-            // Conver the provided file to Markdown
-            const filename = await doc.convertToMarkdown()
-
-            // Insert the link to the converted file if we're in editing mode
-            const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-            if (filename && markdownView) {
-              await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
-                frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
-              })
-            }
-          })
-          modal.open()
-        }
-      })
-    }
+    this.addCommand({
+      id: 'convert-epub',
+      name: 'Import/Convert ePub file',
+      callback: async () => {
+        const modal = new FileModal(app)
+        modal.onFileSelect(async (file: HTMLInputFile) => {
+          modal.close()
+          const epub = new Epub(this)
+          await epub.processHtmlInputFile(file)
+          await epub.convertToMarkdown()
+        })
+        modal.open()
+      }
+    })
   }
 
   async loadSettings () {
