@@ -12,13 +12,17 @@
 	"author": "",
 	"license": "GPL-3.0-or-later",
 	"devDependencies": {
+		"@types/adm-zip": "^0.5.2",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
+		"adm-zip": "^0.5.10",
+		"xml-js": "^1.6.11",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.14.47",
+		"eslint": "^8.49.0",
+		"eslint-config-standard": "^17.1.0",
 		"obsidian": "latest",
-		"obsidian-dataview": "^0.5.56",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	}
