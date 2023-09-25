@@ -1,7 +1,6 @@
 import { Editor, EditorPosition, MarkdownView, Notice, Plugin, TFile } from 'obsidian'
 import { AirQuotesSettings, AirQuotesSettingTab, DEFAULT_SETTINGS } from './Settings'
 import { SearchModal } from './Search'
-import { FileModal, HTMLInputFile } from './FileModal'
 import { Epub } from './Epub'
 
 export default class AirQuotes extends Plugin {
@@ -48,31 +47,39 @@ export default class AirQuotes extends Plugin {
     })
 
     // Import an ePub into your Vault as a new Markdown note
-    // This is not available on mobile
     this.addCommand({
       id: 'convert-epub',
       name: 'Import/Convert ePub file',
       callback: async () => {
-        const modal = new FileModal(app)
-        modal.onFileSelect(async (file: HTMLInputFile) => {
-          modal.close()
+        const fileEl = document.createElement('input')
+        fileEl.type = 'file'
+        fileEl.accept = 'application/epub+zip'
+        fileEl.onchange = async (ev) => {
+          try {
+            // Take the HTML file input and injest the zip data
+            const file = (ev.target as HTMLInputElement)?.files?.[0]
+            if (file) {
+              // Get the file data
+              const epub = new Epub(this)
+              await epub.processHtmlInputFile(file)
 
-          // Take the HTML file input and injest the zip data
-          const epub = new Epub(this)
-          await epub.processHtmlInputFile(file)
+              // Convert the provided file to Markdown
+              const filename = await epub.convertToMarkdown()
 
-          // Convert the provided file to Markdown
-          const filename = await epub.convertToMarkdown()
-
-          // Insert the link to the converted file if we're in editing mode
-          const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView)
-          if (filename && markdownView) {
-            await app.fileManager.processFrontMatter(markdownView.file, frontMatter => {
-              frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
-            })
+              // Insert the link to the converted file if the user has selected that option
+              const activeFile = this.app.workspace.getActiveFile()
+              if (filename && activeFile && this.settings.addLinkToCurrentNote) {
+                await app.fileManager.processFrontMatter(activeFile, frontMatter => {
+                  frontMatter[this.settings.bookSourceVariable] = '[[' + filename.slice(0, -3) + ']]'
+                })
+              }
+            }
+          } catch (e) {
+            console.log(e)
           }
-        })
-        modal.open()
+          fileEl.remove()
+        }
+        fileEl.click()
       }
     })
   }

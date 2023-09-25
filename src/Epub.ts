@@ -2,7 +2,6 @@ import { htmlToMarkdown, Notice, TFile } from 'obsidian'
 import jszip from 'jszip'
 import * as xmljs from 'xml-js'
 import AirQuotes from './main'
-import { HTMLInputFile } from './FileModal'
 
 // The ePub manifest format as extracted by xml-js
 interface EpubManifest {
@@ -38,19 +37,30 @@ export class Epub {
   plugin: AirQuotes
   manifest: EpubManifest
   zip: jszip
-  containerFile: string
-
-  // containerFile: AdmZip.IZipEntry
+  rootFile: string
 
   constructor (plugin: AirQuotes) {
     this.plugin = plugin
   }
 
-  async processHtmlInputFile (file: HTMLInputFile) {
+  async processHtmlInputFile (file: File) {
     this.zip = await jszip.loadAsync(file)
     await this.processMetaInf()
   }
 
+  /**
+   * Case insensitive file search
+   * @param path - The full path to the file inside the zip
+   */
+  findFile (path: string) {
+    const key = Object.keys(this.zip.files).find(key => key.toLowerCase() === path.toLowerCase())
+    return key ? this.zip.files[key] : null
+  }
+
+  /**
+   * Read the contents of a zip file as a string
+   * @param path - The full path to the file inside the zip
+   */
   async readFile (path: string) {
     return await this.zip.file(path)?.async('string') || ''
   }
@@ -63,18 +73,25 @@ export class Epub {
     }) || {}
   }
 
+  /**
+   * Find the document root file from the container.xml
+   */
   async processMetaInf () {
-    const data = await this.zipfileToJson('META-INF/container.xml') as EpubContainer
-    this.containerFile = data.container.rootfiles.rootfile._attributes['full-path'] || ''
+    const file = this.findFile('META-INF/container.xml')
+    if (file) {
+      const data = await this.zipfileToJson(file.name) as EpubContainer
+      this.rootFile = data.container.rootfiles.rootfile._attributes['full-path'] || ''
+    }
   }
 
   async convertToMarkdown () {
-    if (!this.containerFile) return ''
+    if (!this.rootFile) return ''
 
     new Notice('Importing book...')
 
     // Parse the manifest from XML
-    this.manifest = await this.zipfileToJson(this.containerFile) as EpubManifest
+    this.manifest = await this.zipfileToJson(this.rootFile) as EpubManifest
+    console.log(this.manifest)
 
     // Extract the list of book content files from the manifest
     const toc = this.manifest.package.manifest.item
