@@ -6,13 +6,15 @@ export interface AirQuotesSettings {
   outputStyle: string;
   calloutHeader: string;
   importLocation: string;
+  addLinkToCurrentNote: boolean;
 }
 
 export const DEFAULT_SETTINGS: AirQuotesSettings = {
   bookSourceVariable: 'source_text',
   outputStyle: 'callout',
   calloutHeader: '> [!quote]',
-  importLocation: ''
+  importLocation: '',
+  addLinkToCurrentNote: true
 }
 
 export class AirQuotesSettingTab extends PluginSettingTab {
@@ -28,7 +30,9 @@ export class AirQuotesSettingTab extends PluginSettingTab {
 
     containerEl.empty()
 
-    containerEl.createEl('h2', { text: 'Air Quotes settings' })
+    new Setting(containerEl)
+      .setName('Insert quote settings')
+      .setHeading()
 
     new Setting(containerEl)
       .setName('Book source property')
@@ -38,16 +42,6 @@ export class AirQuotesSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.bookSourceVariable)
         .onChange(async value => {
           this.plugin.settings.bookSourceVariable = value
-          await this.plugin.saveSettings()
-        }))
-    new Setting(containerEl)
-      .setName('Import book location')
-      .setDesc('After importing an ePub, the converted Markdown note will be saved into this folder.')
-      .addText(text => text
-        .setPlaceholder('Books in Markdown')
-        .setValue(this.plugin.settings.importLocation)
-        .onChange(async value => {
-          this.plugin.settings.importLocation = value.replace(/^\/+/, '').replace(/\/+$/, '') // remove any leading/trailing slashes
           await this.plugin.saveSettings()
         }))
 
@@ -75,5 +69,32 @@ export class AirQuotesSettingTab extends PluginSettingTab {
           this.plugin.settings.calloutHeader = value
           await this.plugin.saveSettings()
         }))
+
+    new Setting(containerEl)
+      .setName('Importing books')
+      .setHeading()
+
+    new Setting(containerEl)
+      .setName('Import book location')
+      .setDesc('After importing an ePub, the converted Markdown note will be saved into this folder.')
+      .addText(text => text
+        .setPlaceholder('Books in Markdown')
+        .setValue(this.plugin.settings.importLocation)
+        .onChange(async value => {
+          this.plugin.settings.importLocation = value.replace(/^\/+/, '').replace(/\/+$/, '') // remove any leading/trailing slashes
+          await this.plugin.saveSettings()
+        }))
+
+    new Setting(containerEl)
+      .setName('Insert link in current note')
+      .setDesc('After importing, add a link to the imported book using the "Book source" property specified above.')
+      .addToggle(toggle => {
+        toggle
+          .setValue(this.plugin.settings.addLinkToCurrentNote)
+          .onChange(async (value) => {
+            this.plugin.settings.addLinkToCurrentNote = value
+            await this.plugin.saveSettings()
+          })
+      })
   }
 }
