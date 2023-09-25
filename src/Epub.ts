@@ -38,6 +38,7 @@ export class Epub {
   manifest: EpubManifest
   zip: jszip
   rootFile: string
+  drm = false
 
   constructor (plugin: AirQuotes) {
     this.plugin = plugin
@@ -45,6 +46,10 @@ export class Epub {
 
   async processHtmlInputFile (file: File) {
     this.zip = await jszip.loadAsync(file)
+    if (this.findFile('META-INF/encryption.xml')) {
+      new Notice('⛔ This book appears to be DRM encrypted. We will still convert it, but it\'s likely you won\'t be able to read it. You will need to DeDRM the file first before importing.', 20000)
+      this.drm = true
+    }
     await this.processMetaInf()
   }
 
@@ -91,7 +96,6 @@ export class Epub {
 
     // Parse the manifest from XML
     this.manifest = await this.zipfileToJson(this.rootFile) as EpubManifest
-    console.log(this.manifest)
 
     // Extract the list of book content files from the manifest
     const toc = this.manifest.package.manifest.item
@@ -135,7 +139,7 @@ export class Epub {
       // Create a new file
       await app.vault.create(noteFilename, contents)
     }
-    new Notice('✔ Successfully imported ' + title)
+    new Notice((this.drm ? 'Imported ' : '✔ Successfully imported ') + title)
     return noteFilename
   }
 
