@@ -2,6 +2,7 @@ import { htmlToMarkdown, Notice, TFile } from 'obsidian'
 import jszip from 'jszip'
 import * as xmljs from 'xml-js'
 import AirQuotes from './main'
+import { filter } from 'builtin-modules'
 
 // The ePub manifest format as extracted by xml-js
 interface EpubManifest {
@@ -127,7 +128,8 @@ export class Epub {
     const titleParts = []
     if (this.metadataValue('title')) titleParts.push(this.metadataValue('title'))
     if (this.metadataValue('creator')) titleParts.push(this.metadataValue('creator'))
-    const title = titleParts.join(' - ')
+    // Replace characters which Obsidian doesn't allow in filenames
+    const title = this.makeFilesystemSafeTitle(titleParts.join(' - '))
     const noteFilename = folder + title + '.md'
     if (await app.vault.adapter.exists(noteFilename)) {
       const outputFile = app.vault.getAbstractFileByPath(noteFilename)
@@ -145,5 +147,27 @@ export class Epub {
 
   metadataValue (key: string) {
     return this.manifest?.package?.metadata?.['dc:' + key]?._text || ''
+  }
+
+  makeFilesystemSafeTitle (title: string) {
+    // https://stackoverflow.com/questions/10386344/how-to-get-a-file-in-windows-with-a-colon-in-the-filename
+    // some replacements: ” ‹ › ⁎ ∕ ⑊ ＼︖ ꞉ ⏐
+    const replacements: { [key: string]: string } = {
+      ':': '꞉',
+      '/': '∕',
+      '\\': '＼',
+      '?': '︖',
+      '*': '⁎',
+      '"': '”',
+      '<': '‹',
+      '>': '›',
+      '|': '⏐'
+    }
+    for (const key of Object.keys(replacements)) {
+      title = title.split(key).join(replacements[key])
+    }
+    // Remove characters which Obsidian doesn't allow in filenames
+    title = title.replace(/[*"\\/<>:|?]/g, '')
+    return title
   }
 }
