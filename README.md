@@ -14,41 +14,26 @@ The existing solutions are essentially either:
 
 **Air Quotes** for Obsidian is a method for near-instant inserting of direct quotes from a source text.
 
-Here's a demo from the book I'm currently reading:
+Here's a demo:
 
-I've found a great quote which I want to insert. I start typing the first few words of the quote,
-and it instantly finds it in the book. I use the arrow keys to increase/decrease the size of the quote,
-and then hit Enter to insert it into my note.
-
-![](img/demo.gif)
-
-Here's a demo with a print book. The caveat of course is that you also need an ebook copy. It's a great experience doing this with a mobile device - makes for very quick note taking.
-
-[![](img/video-demo.jpg)](https://www.youtube.com/watch?v=G-hpPOMCQys)
+[![](img/video-demo.jpg)](https://www.youtube.com/watch?v=PhP02zbiVS4)
 
 ## How it works
 
 #### Step 1
 
-You first need a Markdown format version of the book in your vault. This is the source for the quote text. See the docs on [how to convert your books to Markdown](docs/Converting%20books%20to%20Markdown.md).
+You first need a Markdown format version of the book in your vault. This is the source for the quote text.
+
+- If the source text is already in a note (for example, people who have the Bible or the Quran as a note) then you're good to go.
+- If you have an ePub copy of the book, the plugin can convert this straight into an Obsidian note for you. Use the command `Import ePub file`.
+- If you have an ebook in another format, you can usually get [Calibre](https://calibre-ebook.com/) to convert it for you. 
+- If you're reading a print book, then you'll need to source an ebook copy. Your public library might have Libby or Overdrive available, which are good ebook sources.
 
 #### Step 2
 
-Link the source text note to your current note. This is the Markdown (or plain text) formatted note inside your Obsidian vault.
+Link the source text note to your current note by adding a `source_text` property, and adding the link to your source text.
 
-You can use either the standard YAML format:
-
-```
----
-source_text: "[[link/to/Amazing Book]]"
----
-```
-
-Or the Dataview format:
-
-```
-source_text:: [[link/to/Amazing Book]]
-```
+You can customise the name of this property in the Settings if you like.
 
 #### Step 3
 
@@ -58,8 +43,7 @@ That's it! Now you can run the "Insert quote" command.
 
 **Does this work on mobile?**
 
-Yes indeed. You'll likely need to add the source text on desktop, as Pandoc isn't supported on mobile, 
-but the insert quote function works just fine.
+Absolutely, it works great!
 
 **Why not use the built-in block link `#^` which already has its own search feature?**
 
