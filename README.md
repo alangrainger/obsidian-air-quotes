@@ -14,7 +14,7 @@ The existing solutions are essentially either:
 
 **Air Quotes** for Obsidian is a method for near-instant inserting of direct quotes from a source text.
 
-Here's a demo:
+[Here's a demo](https://www.youtube.com/watch?v=PhP02zbiVS4):
 
 [![](img/video-demo.jpg)](https://www.youtube.com/watch?v=PhP02zbiVS4)
 
