@@ -31,9 +31,7 @@ You first need a Markdown format version of the book in your vault. This is the 
 
 #### Step 2
 
-Link the source text note to your current note by adding a `source_text` property, and adding the link to your source text.
-
-You can customise the name of this property in the Settings if you like.
+Link the source text note to your current note by adding a `source_text` property, and adding the link to your source text. You can customise the name of this property in the Settings if you like.
 
 #### Step 3
 
