@@ -150,8 +150,6 @@ export class Epub {
   }
 
   makeFilesystemSafeTitle (title: string) {
-    // https://stackoverflow.com/questions/10386344/how-to-get-a-file-in-windows-with-a-colon-in-the-filename
-    // some replacements: ” ‹ › ⁎ ∕ ⑊ ＼︖ ꞉ ⏐
     const replacements: { [key: string]: string } = {
       ':': '꞉',
       '/': '∕',
