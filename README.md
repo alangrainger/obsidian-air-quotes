@@ -18,6 +18,8 @@ Here's a demo:
 
 [![](img/video-demo.jpg)](https://www.youtube.com/watch?v=PhP02zbiVS4)
 
+https://www.youtube.com/watch?v=PhP02zbiVS4
+
 ## How it works
 
 #### Step 1
