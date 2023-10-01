@@ -26,7 +26,21 @@ export default class AirQuotes extends Plugin {
           // Get the location for the note containing the source text
           const metadata = app.metadataCache.getFileCache(view.file)
           // @ts-ignore
-          const bookPath = metadata?.frontmatterLinks?.find(x => x.key === this.settings.bookSourceVariable)?.link
+          let bookPath = metadata?.frontmatterLinks?.find(x => x.key === this.settings.bookSourceVariable)?.link
+
+          if (!bookPath) {
+            // If no source text property found, look for a Dataview property
+            // I don't use the Dataview NPM package as it introduces some vulnerabilities shown in an npm audit
+            try {
+              // @ts-ignore
+              const dv = app?.plugins?.plugins?.dataview?.api
+              if (dv) {
+                bookPath = dv.page(view.file.path)?.[this.settings.bookSourceVariable]?.path
+              }
+            } catch (e) {
+              console.log(e)
+            }
+          }
 
           if (!bookPath) {
             // No matching YAML/frontmatter field was found
