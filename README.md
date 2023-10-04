@@ -4,6 +4,8 @@
 
 <a href="https://ko-fi.com/alan_" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" style="width:190px"></a>
 
+[📝💬 Obsidian forum link for this plugin](https://forum.obsidian.md/t/68421)
+
 I love reading paper books or on eReader devices while taking notes on my laptop or phone, 
 but it massively interrupts my flow to capture quotes from the book.
 
