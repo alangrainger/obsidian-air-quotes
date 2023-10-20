@@ -4,8 +4,7 @@
 
 [📝💬 Obsidian forum link for this plugin](https://forum.obsidian.md/t/68421)
 
-I love reading paper books or on eReader devices while taking notes on my laptop or phone, 
-but it massively interrupts my flow to capture quotes from the book.
+I love reading paper books or on eReader devices while taking notes on my laptop or phone, but it massively interrupts my flow to capture quotes from the book.
 
 The existing solutions are essentially either:
 
@@ -24,7 +23,7 @@ https://www.youtube.com/watch?v=PhP02zbiVS4
 
 #### Step 1
 
-You first need a Markdown format version of the book in your vault. This is the source for the quote text.
+You first need a Markdown format version of the book in your vault. The plugin can handle creating this for you. This text is the source for the quotes.
 
 - If the source text is already in a note (for example, people who have the Bible or the Quran as a note) then you're good to go.
 - If you have an ePub copy of the book, the plugin can convert this straight into an Obsidian note for you. Use the command `Import ePub file`.
