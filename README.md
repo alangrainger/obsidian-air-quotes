@@ -52,6 +52,4 @@ you'll receive a lot of incorrect results, and you might not even find the corre
 
 ### Will you add images to ePub import
 
-EPub import is currently considered feature-complete for the purpose of importing an ePub file to use as source text for quotes. I don't plan to add any additional features to this, like image import.
-
-If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
+EPub import is currently considered feature-complete for the purpose of importing an ePub file to use as source text for quotes. If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
