@@ -40,12 +40,18 @@ That's it! Now you can run the "Insert quote" command.
 
 ## FAQs
 
-**Does this work on mobile?**
+### Does this work on mobile?
 
 Absolutely, it works great!
 
-**Why not use the built-in block link `#^` which already has its own search feature?**
+### Why not use the built-in block link `#^` which already has its own search feature?
 
 1. I don't like the fuzzy search. If the words you're typing are very common in the book,
 you'll receive a lot of incorrect results, and you might not even find the correct result.
 2. I like the function of increasing/decreasing the size of the quote with the arrow keys.
+
+### Will you add images to ePub import
+
+EPub import is currently considered feature-complete for the purpose of importing an ePub file to use as source text for quotes. I don't plan to add any additional features to this, like image import.
+
+If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
