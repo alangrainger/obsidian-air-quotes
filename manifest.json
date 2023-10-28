@@ -1,7 +1,7 @@
 {
 	"id": "air-quotes",
 	"name": "Air Quotes",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"minAppVersion": "0.15.0",
 	"description": "Search and insert quotes from a source text as you type. This is great for reading a physical book or eReader while taking notes on a separate laptop or phone. The plugin can also convert ePub files to Markdown notes.",
 	"author": "Alan Grainger",

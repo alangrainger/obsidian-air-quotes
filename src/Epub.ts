@@ -101,7 +101,7 @@ export class Epub {
     // Extract the list of book content files from the manifest
     const toc = this.manifest.package.manifest.item
       .map(item => item._attributes.href)
-      .filter(item => item.match(/\.x?html$/))
+      .filter(item => item.match(/\.x?html?$/))
 
     // Convert the book to Markdown
     let contents = ''
