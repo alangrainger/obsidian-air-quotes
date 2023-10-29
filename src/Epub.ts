@@ -110,7 +110,13 @@ export class Epub {
       const path = Object.keys(this.zip.files).find(path => path.endsWith(tocItem)) || ''
       // Read the file and convert to Markdown
       const html = await this.readFile(path)
-      contents += htmlToMarkdown(html)
+      const bodyMatch = html.match(/.*?<body[^>]*?>(.+)<\/body>/si)
+      if (bodyMatch) {
+        // If the HTML contains <body> tags, then get the content from inside them
+        contents += htmlToMarkdown(bodyMatch[1])
+      } else {
+        contents += htmlToMarkdown(html)
+      }
     }
 
     // Check for destination folder
