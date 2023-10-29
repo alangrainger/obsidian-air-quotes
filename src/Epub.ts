@@ -10,7 +10,8 @@ interface EpubManifest {
     manifest: {
       item: [{
         _attributes: {
-          href: string
+          href: string,
+          'media-type': string
         }
       }]
     },
@@ -100,23 +101,29 @@ export class Epub {
 
     // Extract the list of book content files from the manifest
     const toc = this.manifest.package.manifest.item
-      .map(item => item._attributes.href)
-      .filter(item => item.match(/\.x?html?$/))
+      .map(item => item._attributes)
+      .filter(item => item.href.match(/\.x?html?$/))
 
     // Convert the book to Markdown
     let contents = ''
     for (const tocItem of toc) {
       // Get the full file path for a manifest entry
-      const path = Object.keys(this.zip.files).find(path => path.endsWith(tocItem)) || ''
+      const path = Object.keys(this.zip.files).find(path => path.endsWith(tocItem.href)) || ''
       // Read the file and convert to Markdown
-      const html = await this.readFile(path)
-      const bodyMatch = html.match(/.*?<body[^>]*?>(.+)<\/body>/si)
-      if (bodyMatch) {
-        // If the HTML contains <body> tags, then get the content from inside them
-        contents += htmlToMarkdown(bodyMatch[1])
-      } else {
-        contents += htmlToMarkdown(html)
-      }
+      const dom = new DOMParser()
+        .parseFromString(await this.readFile(path), (tocItem['media-type'] || 'text/html') as DOMParserSupportedType)
+      // Remove any images
+      dom.querySelectorAll('img')
+        .forEach(img => img.remove())
+      // Replace internal links with their inner HTML to turn them into text
+      Array.from(dom.querySelectorAll('a'))
+        .filter(el =>
+          // Filter for internal links only
+          el.getAttribute('href') &&
+          !el.getAttribute('href')?.startsWith('http'))
+        .forEach(el => { el.outerHTML = el.innerHTML })
+      // Convert to Markdown
+      contents += htmlToMarkdown(dom.documentElement.innerHTML)
     }
 
     // Check for destination folder
