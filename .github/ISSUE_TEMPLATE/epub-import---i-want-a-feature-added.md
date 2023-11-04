@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-EPub import is currently considered feature-complete for the purpose of importing an ePub file to use as source text for quotes.
+EPub import is considered feature-complete for the purpose of importing an ePub file to use as the source text for quotes.
 
-I don't plan to add any additional features to this, like image import. For the purpose of extracting text quotes from a source text, importing images only serves to increase the size of your vault for no reason.
+If you require additional features for your ePub import, you can use one of the many existing fully-featured ePub to Markdown tools such as Pandoc or Calibre.
 
-If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself.
+If someone wants to code a feature up and submit a Pull Request I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
