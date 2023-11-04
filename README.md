@@ -56,4 +56,4 @@ EPub import is considered feature-complete for the purpose of importing an ePub 
 
 If you require additional features for your ePub import, you can use one of the many existing fully-featured ePub to Markdown tools such as [Pandoc](https://pandoc.org/) or [Calibre](https://calibre-ebook.com/).
 
-Regarding the Air Quotes import function, if someone wants to code a feature up and submit a Pull Request I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
+If someone wants to code a feature up and submit a Pull Request I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
