@@ -52,6 +52,6 @@ you'll receive a lot of incorrect results, and you might not even find the corre
 
 ### Will you add images or other features to ePub import
 
-EPub import is currently considered feature-complete for the purpose of importing an ePub file to use as source text for quotes. If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
+EPub import is considered feature-complete for the purpose of importing an ePub file to use as source text for quotes. If someone wants to code a feature up and submit a Pull Request, I'll have a look at it, but I have no current plans to add anything additional myself to the ePub import.
 
-For more advanced control of your ePub to Markdown import you can use one of the many existing full-featured tools, such as [Pandoc](https://pandoc.org/) or [Calibre](https://calibre-ebook.com/).
+For more advanced control of your import you can use one of the many existing fully-featured ePub to Markdown tools, such as [Pandoc](https://pandoc.org/) or [Calibre](https://calibre-ebook.com/).
