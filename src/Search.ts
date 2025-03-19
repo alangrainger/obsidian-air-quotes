@@ -70,7 +70,7 @@ export class QuoteModal extends Modal {
     this.plugin = plugin
     this.index = 5 // The initial number of sentences to display for a quote
     // Split the incoming text into sentences
-    this.sentences = [...text.matchAll(/.+?[.?!\n]['"’”]?\s+(?=[“‘"']?[A-Z])/sg)].map(x => x[0])
+    this.sentences = [...text.matchAll(/.+?[.?!\n]['"’”]?\s+(?=[“‘"']?\p{Lu})/sgu)].map(x => x[0])
   }
 
   async onOpen () {
