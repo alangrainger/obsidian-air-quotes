@@ -49,7 +49,7 @@ export class SearchModal extends SuggestModal<any> {
     el.setText(value.text)
   }
 
-  onChooseSuggestion (item: any, evt: MouseEvent | KeyboardEvent) {
+  onChooseSuggestion (item: any, _evt: MouseEvent | KeyboardEvent) {
     // Take a sample of the next 5000 characters, to use in the insert modal
     const sample = this.sourceText.slice(item.index, item.index + 5000)
 
@@ -168,7 +168,7 @@ export class QuoteModal extends Modal {
    */
   async insertTextIntoEditor () {
     const text = this.formatAsFinalMarkdownOutput()
-    await this.close()
+    this.close()
     this.plugin.editor.replaceRange(text, this.plugin.cursorPosition)
     this.plugin.editor.setCursor({ line: this.plugin.cursorPosition.line + text.split('\n').length, ch: 0 })
   }
