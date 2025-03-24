@@ -1,6 +1,6 @@
 {
 	"name": "air-quotes",
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"description": "Search and insert quotes from a source text as you type. This is great for reading a physical book or eReader while taking notes on a separate laptop or phone. The plugin can also convert ePub files to Markdown notes.",
 	"main": "main.js",
 	"scripts": {
